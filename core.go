@@ -7,12 +7,23 @@ import (
 
 type Epimetheus struct {
 	config *viper.Viper
-	timers map[string]*Timer
+	CommTimer *Timer
+	FunctionTimer *Timer
+	CacheRate *Counter
 }
 
 func NewEpimetheusWatcher(config *viper.Viper) *Epimetheus {
+	ctLabels := [...]string{"service", "method", "status"}
+	ct := e.NewTimer("Communications", ctLabels[:])
+	ptLabels := [...]string{"funcName"}
+	pt := e.NewTimer("Functions", ptLabels[:])
+	crLabels := [...]string{"cacheName", "status"}
+	cr := e.NewCounter("Caches", ptLabels[:])
 	return &Epimetheus{
 		config: config,
+		CommTimer: ct,
+		ProcessTimer: pt,
+		CacheRate cr,
 	}
 }
 
@@ -20,17 +31,6 @@ func (e *Epimetheus) Listen() {
 	port := e.config.GetInt("prometheus.port")
 	server := NewServer(port)
 	server.Serve()
-}
-
-func (e *Epimetheus) NewCommunicationTimer() *Timer {
-	if e.timers["Communications"] != nil {
-		return e.timers["Communications"]
-	}
-	// making the labels default to increase simplicity
-	labels := [...]string{"service", "method", "status"}
-	ct := e.NewTimer("Communications", labels[:])
-	e.timers["Communications"] = ct
-	return ct
 }
 
 func (e *Epimetheus) NewTimer(name string, labelNames []string) *Timer {
@@ -58,12 +58,4 @@ func (e *Epimetheus) NewGauge(name string, labelNames []string) *Gauge {
 		Name:      name,
 	}
 	return NewGauge(opts, labelNames)
-}
-
-func CommParams(service string, method string, status string) []string {
-	return map[string]string{
-		"service": service,
-		"method":  method,
-		"status":  status,
-	}
 }
