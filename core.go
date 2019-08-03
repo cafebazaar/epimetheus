@@ -7,6 +7,7 @@ import (
 
 type Epimetheus struct {
 	config *viper.Viper
+	timers map[string]*Timer
 }
 
 func NewEpimetheusWatcher(config *viper.Viper) *Epimetheus {
@@ -22,9 +23,14 @@ func (e *Epimetheus) Listen() {
 }
 
 func (e *Epimetheus) NewCommunicationTimer() *Timer {
+	if e.timers["Communications"] != nil {
+		return e.timers["Communications"]
+	}
 	// making the labels default to increase simplicity
 	labels := [...]string{"service", "method", "status"}
-	return e.NewTimer("Communications", labels[:])
+	ct := e.NewTimer("Communications", labels[:])
+	e.timers["Communications"] = ct
+	return ct
 }
 
 func (e *Epimetheus) NewTimer(name string, labelNames []string) *Timer {
