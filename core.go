@@ -60,18 +60,10 @@ func (e *Epimetheus) NewGauge(name string, labelNames []string) *Gauge {
 	return NewGauge(opts, labelNames)
 }
 
-func CommParams(service string, method string, status string) map[string]string {
+func CommParams(service string, method string, status string) []string {
 	return map[string]string{
 		"service": service,
 		"method":  method,
 		"status":  status,
 	}
-}
-
-func RawParam(params ...string) map[string]string {
-	result := make(map[string]string, len(params))
-	for i := 0; i < len(params); i += 2 {
-		result[params[i]] = params[i+1]
-	}
-	return result
 }

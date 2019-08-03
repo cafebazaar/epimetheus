@@ -12,32 +12,24 @@ type StaticGauge struct {
 	values []string
 }
 
-func NewGauge(opts prometheus.GaugeOpts, labels []string) *Gauge {
-	vec := prometheus.NewGaugeVec(opts, labels)
+func NewGauge(opts prometheus.GaugeOpts, labelNames []string) *Gauge {
+	vec := prometheus.NewGaugeVec(opts, labelNames)
 	prometheus.MustRegister(vec)
 
 	return &Gauge{
 		watcher: vec,
-		labels:  labels,
+		labels:  labelNames,
 	}
 }
 
-func (w *Gauge) Set(labels map[string]string, value float64) {
-	values := make([]string, len(w.labels))
-	for i, label := range w.labels {
-		values[i] = labels[label]
-	}
-	w.watcher.WithLabelValues(values...).Set(value)
+func (w *Gauge) Set(labelValues ...string, value float64) {
+	w.watcher.WithLabelValues(labelValues...).Set(value)
 }
 
-func (w *Gauge) NewStaticGauge(labels map[string]string) *StaticGauge {
-	values := make([]string, len(w.labels))
-	for i, label := range w.labels {
-		values[i] = labels[label]
-	}
+func (w *Gauge) NewStaticGauge(labelValues ...string) *StaticGauge {
 	return &StaticGauge{
 		Base:   w,
-		values: values,
+		values: labelValues,
 	}
 }
 

@@ -18,32 +18,32 @@ type RunningTimer struct {
 	end   time.Time
 }
 
-func NewTimer(opts prometheus.HistogramOpts, labels []string) *Timer {
-	vec := prometheus.NewHistogramVec(opts, labels)
+func NewTimer(opts prometheus.HistogramOpts, labelNames []string) *Timer {
+	vec := prometheus.NewHistogramVec(opts, labelNames)
 	prometheus.MustRegister(vec)
 
 	return &Timer{
 		watcher: vec,
-		labels:  labels,
+		labels:  labelNames,
 	}
 }
 
-func (w *Timer) RunWithError(work func() error, labels map[string]string) error {
+func (w *Timer) RunWithError(work func() error, labelValues ...string) error {
 	start := time.Now()
 	err := work()
 	end := time.Now()
 	if w.hasLabel("ok") {
-		labels["ok"] = fmt.Sprint(err == nil)
+		labelValues["ok"] = fmt.Sprint(err == nil)
 	}
-	w.register(start, end, labels)
+	w.register(start, end, labelValues...)
 	return err
 }
 
-func (w *Timer) RunVoid(work func(), labels map[string]string) {
+func (w *Timer) RunVoid(work func(), labelValues ...string) {
 	start := time.Now()
 	work()
 	end := time.Now()
-	w.register(start, end, labels)
+	w.register(start, end, labelValues)
 }
 
 func (w *Timer) Start() *RunningTimer {
@@ -53,18 +53,14 @@ func (w *Timer) Start() *RunningTimer {
 	}
 }
 
-func (rt *RunningTimer) Done(labels map[string]string) {
+func (rt *RunningTimer) Done(labelValues ...string) {
 	rt.end = time.Now()
-	rt.Base.register(rt.start, rt.end, labels)
+	rt.Base.register(rt.start, rt.end, labelValues)
 }
 
-func (w *Timer) register(start time.Time, end time.Time, labels map[string]string) {
-	values := make([]string, len(w.labels))
-	for i, label := range w.labels {
-		values[i] = labels[label]
-	}
+func (w *Timer) register(start time.Time, end time.Time, labelValues []string) {
 	duration := end.Sub(start)
-	w.watcher.WithLabelValues(values...).Observe(duration.Seconds())
+	w.watcher.WithLabelValues(labelValues...).Observe(duration.Seconds())
 }
 
 func (w *Timer) hasLabel(label string) bool {

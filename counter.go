@@ -12,32 +12,24 @@ type StaticCounter struct {
 	values []string
 }
 
-func NewCounter(opts prometheus.CounterOpts, labels []string) *Counter {
-	vec := prometheus.NewCounterVec(opts, labels)
+func NewCounter(opts prometheus.CounterOpts, labelNames []string) *Counter {
+	vec := prometheus.NewCounterVec(opts, labelNames)
 	prometheus.MustRegister(vec)
 
 	return &Counter{
 		watcher: vec,
-		labels:  labels,
+		labels:  labelNames,
 	}
 }
 
-func (w *Counter) Inc(labels map[string]string) {
-	values := make([]string, len(w.labels))
-	for i, label := range w.labels {
-		values[i] = labels[label]
-	}
-	w.watcher.WithLabelValues(values...).Inc()
+func (w *Counter) Inc(labelValues ...string) {
+	w.watcher.WithLabelValues(labelValues...).Inc()
 }
 
-func (w *Counter) NewStaticCounter(labels map[string]string) *StaticCounter {
-	values := make([]string, len(w.labels))
-	for i, label := range w.labels {
-		values[i] = labels[label]
-	}
+func (w *Counter) NewStaticCounter(labelValues ...string) *StaticCounter {
 	return &StaticCounter{
 		Base:   w,
-		values: values,
+		values: labelValues,
 	}
 }
 
