@@ -2,13 +2,17 @@ package epimetheus
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
+	"github.com/cactus/go-statsd-client/statsd"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
 type Timer struct {
 	watcher *prometheus.HistogramVec
+	client  *statsd.Statter
+	prefix  string
 	labels  []string
 }
 
@@ -18,13 +22,19 @@ type RunningTimer struct {
 	end   time.Time
 }
 
-func NewTimer(opts prometheus.HistogramOpts, labelNames []string) *Timer {
+func NewTimer(namespace, subsystem, name string, labelNames []string, client *statsd.Statter) *Timer {
+	opts := prometheus.HistogramOpts{
+		Namespace: namespace,
+		Subsystem: subsystem,
+		Name:      name,
+	}
 	vec := prometheus.NewHistogramVec(opts, labelNames)
 	prometheus.MustRegister(vec)
-
 	return &Timer{
 		watcher: vec,
 		labels:  labelNames,
+		client:  client,
+		prefix:  strings.Join([]string{namespace, subsystem, name}, "."),
 	}
 }
 
@@ -61,6 +71,8 @@ func (rt *RunningTimer) Done(labelValues ...string) {
 func (w *Timer) register(start time.Time, end time.Time, labelValues []string) {
 	duration := end.Sub(start)
 	w.watcher.WithLabelValues(labelValues...).Observe(duration.Seconds())
+	metaLabel := w.prefix + "." + strings.Join(labelValues, ".")
+	(*w.client).Timing(metaLabel, int64(duration/time.Millisecond), 1.0)
 }
 
 func (w *Timer) hasLabel(label string) int {

@@ -1,7 +1,11 @@
 package epimetheus
 
 import (
-	"github.com/prometheus/client_golang/prometheus"
+	"fmt"
+	"time"
+
+	"github.com/cactus/go-statsd-client/statsd"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -33,32 +37,39 @@ func (e *Epimetheus) InitWatchers() {
 func (e *Epimetheus) Listen() {
 	port := e.config.GetInt("prometheus.port")
 	server := NewServer(port)
+	logrus.Debugf("Epimetheus is Listening on port %d", port)
 	server.Serve()
 }
 
-func (e *Epimetheus) NewTimer(name string, labelNames []string) *Timer {
-	opts := prometheus.HistogramOpts{
-		Namespace: e.config.GetString("prometheus.namespace"),
-		Subsystem: e.config.GetString("prometheus.system-name"),
-		Name:      name,
+func (e *Epimetheus) MakeClient() *statsd.Statter {
+	port := e.config.GetInt("statsd.port")
+	host := e.config.GetString("statsd.host")
+	addr := fmt.Sprintf("%s:%d", host, port)
+	logrus.Debugf("Statsd is sending to %s", addr)
+	client, err := statsd.NewBufferedClient(addr, "", 500*time.Millisecond, 0)
+	if err != nil {
+		logrus.Error("Failed to start Statsd Client")
 	}
-	return NewTimer(opts, labelNames)
+	return &client
+}
+
+func (e *Epimetheus) NewTimer(name string, labelNames []string) *Timer {
+	namespace := e.config.GetString("prometheus.namespace")
+	subsystem := e.config.GetString("prometheus.system-name")
+	client := e.MakeClient()
+	return NewTimer(namespace, subsystem, name, labelNames, client)
 }
 
 func (e *Epimetheus) NewCounter(name string, labelNames []string) *Counter {
-	opts := prometheus.CounterOpts{
-		Namespace: e.config.GetString("prometheus.namespace"),
-		Subsystem: e.config.GetString("prometheus.system-name"),
-		Name:      name,
-	}
-	return NewCounter(opts, labelNames)
+	namespace := e.config.GetString("prometheus.namespace")
+	subsystem := e.config.GetString("prometheus.system-name")
+	client := e.MakeClient()
+	return NewCounter(namespace, subsystem, name, labelNames, client)
 }
 
 func (e *Epimetheus) NewGauge(name string, labelNames []string) *Gauge {
-	opts := prometheus.GaugeOpts{
-		Namespace: e.config.GetString("prometheus.namespace"),
-		Subsystem: e.config.GetString("prometheus.system-name"),
-		Name:      name,
-	}
-	return NewGauge(opts, labelNames)
+	namespace := e.config.GetString("prometheus.namespace")
+	subsystem := e.config.GetString("prometheus.system-name")
+	client := e.MakeClient()
+	return NewGauge(namespace, subsystem, name, labelNames, client)
 }

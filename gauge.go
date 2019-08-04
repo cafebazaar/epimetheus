@@ -1,9 +1,16 @@
 package epimetheus
 
-import "github.com/prometheus/client_golang/prometheus"
+import (
+	"strings"
+
+	"github.com/cactus/go-statsd-client/statsd"
+	"github.com/prometheus/client_golang/prometheus"
+)
 
 type Gauge struct {
 	watcher *prometheus.GaugeVec
+	client  *statsd.Statter
+	prefix  string
 	labels  []string
 }
 
@@ -12,18 +19,27 @@ type StaticGauge struct {
 	values []string
 }
 
-func NewGauge(opts prometheus.GaugeOpts, labelNames []string) *Gauge {
+func NewGauge(namespace, subsystem, name string, labelNames []string, client *statsd.Statter) *Gauge {
+	opts := prometheus.GaugeOpts{
+		Namespace: namespace,
+		Subsystem: subsystem,
+		Name:      name,
+	}
 	vec := prometheus.NewGaugeVec(opts, labelNames)
 	prometheus.MustRegister(vec)
 
 	return &Gauge{
 		watcher: vec,
 		labels:  labelNames,
+		client:  client,
+		prefix:  strings.Join([]string{namespace, subsystem, name}, "."),
 	}
 }
 
 func (w *Gauge) Set(value float64, labelValues ...string) {
 	w.watcher.WithLabelValues(labelValues...).Set(value)
+	metaLabel := w.prefix + "." + strings.Join(labelValues, ".")
+	(*w.client).Gauge(metaLabel, int64(value), 1.0)
 }
 
 func (w *Gauge) NewStaticGauge(labelValues ...string) *StaticGauge {
