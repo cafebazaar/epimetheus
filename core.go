@@ -6,24 +6,27 @@ import (
 )
 
 type Epimetheus struct {
-	config *viper.Viper
-	CommTimer *Timer
+	config        *viper.Viper
+	CommTimer     *Timer
 	FunctionTimer *Timer
-	CacheRate *Counter
+	CacheRate     *Counter
 }
 
 func NewEpimetheusWatcher(config *viper.Viper) *Epimetheus {
+	e := &Epimetheus{
+		config: config,
+	}
 	ctLabels := [...]string{"service", "method", "status"}
 	ct := e.NewTimer("Communications", ctLabels[:])
 	ptLabels := [...]string{"funcName"}
 	pt := e.NewTimer("Functions", ptLabels[:])
 	crLabels := [...]string{"cacheName", "status"}
-	cr := e.NewCounter("Caches", ptLabels[:])
+	cr := e.NewCounter("Caches", crLabels[:])
 	return &Epimetheus{
-		config: config,
-		CommTimer: ct,
-		ProcessTimer: pt,
-		CacheRate cr,
+		config:        config,
+		CommTimer:     ct,
+		FunctionTimer: pt,
+		CacheRate:     cr,
 	}
 }
 

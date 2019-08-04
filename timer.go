@@ -32,10 +32,10 @@ func (w *Timer) RunWithError(work func() error, labelValues ...string) error {
 	start := time.Now()
 	err := work()
 	end := time.Now()
-	if w.hasLabel("ok") {
-		labelValues["ok"] = fmt.Sprint(err == nil)
+	if indx := w.hasLabel("ok"); indx > 0 {
+		labelValues[indx] = fmt.Sprint(err == nil)
 	}
-	w.register(start, end, labelValues...)
+	w.register(start, end, labelValues)
 	return err
 }
 
@@ -63,11 +63,11 @@ func (w *Timer) register(start time.Time, end time.Time, labelValues []string) {
 	w.watcher.WithLabelValues(labelValues...).Observe(duration.Seconds())
 }
 
-func (w *Timer) hasLabel(label string) bool {
-	for _, l := range w.labels {
+func (w *Timer) hasLabel(label string) int {
+	for i, l := range w.labels {
 		if l == label {
-			return true
+			return i
 		}
 	}
-	return false
+	return -1
 }

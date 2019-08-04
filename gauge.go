@@ -22,7 +22,7 @@ func NewGauge(opts prometheus.GaugeOpts, labelNames []string) *Gauge {
 	}
 }
 
-func (w *Gauge) Set(labelValues ...string, value float64) {
+func (w *Gauge) Set(value float64, labelValues ...string) {
 	w.watcher.WithLabelValues(labelValues...).Set(value)
 }
 
