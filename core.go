@@ -12,22 +12,22 @@ type Epimetheus struct {
 	CacheRate     *Counter
 }
 
-func NewEpimetheusWatcher(config *viper.Viper) *Epimetheus {
-	e := &Epimetheus{
+func NewEpimetheus(config *viper.Viper) *Epimetheus {
+	return &Epimetheus{
 		config: config,
 	}
-	ctLabels := [...]string{"service", "method", "status"}
-	ct := e.NewTimer("Communications", ctLabels[:])
-	ptLabels := [...]string{"funcName"}
-	pt := e.NewTimer("Functions", ptLabels[:])
-	crLabels := [...]string{"cacheName", "status"}
-	cr := e.NewCounter("Caches", crLabels[:])
-	return &Epimetheus{
-		config:        config,
-		CommTimer:     ct,
-		FunctionTimer: pt,
-		CacheRate:     cr,
+}
+
+func (e *Epimetheus) InitWatchers() {
+	if e.CommTimer != nil {
+		return
 	}
+	ctLabels := [...]string{"service", "method", "status"}
+	e.CommTimer = e.NewTimer("Communications", ctLabels[:])
+	ptLabels := [...]string{"funcName"}
+	e.FunctionTimer = e.NewTimer("Functions", ptLabels[:])
+	crLabels := [...]string{"cacheName", "status"}
+	e.CacheRate = e.NewCounter("Caches", crLabels[:])
 }
 
 func (e *Epimetheus) Listen() {
