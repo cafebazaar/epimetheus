@@ -35,15 +35,22 @@ func (e *Epimetheus) InitWatchers() {
 }
 
 func (e *Epimetheus) Listen() {
-	port := e.config.GetInt("prometheus.port")
+	if !e.config.GetBool("stats.prometheus.enabled") {
+		return
+	}
+	port := e.config.GetInt("stats.prometheus.port")
 	server := NewServer(port)
 	logrus.Debugf("Epimetheus is Listening on port %d", port)
 	server.Serve()
 }
 
 func (e *Epimetheus) MakeClient() *statsd.Statter {
-	port := e.config.GetInt("statsd.port")
-	host := e.config.GetString("statsd.host")
+	if !e.config.GetBool("stats.statsd.enabled") {
+		client, _ := statsd.NewNoopClient()
+		return &client
+	}
+	port := e.config.GetInt("stats.statsd.port")
+	host := e.config.GetString("stats.statsd.host")
 	addr := fmt.Sprintf("%s:%d", host, port)
 	logrus.Debugf("Statsd is sending to %s", addr)
 	client, err := statsd.NewBufferedClient(addr, "", 500*time.Millisecond, 0)
@@ -54,22 +61,22 @@ func (e *Epimetheus) MakeClient() *statsd.Statter {
 }
 
 func (e *Epimetheus) NewTimer(name string, labelNames []string) *Timer {
-	namespace := e.config.GetString("prometheus.namespace")
-	subsystem := e.config.GetString("prometheus.system-name")
+	namespace := e.config.GetString("stats.namespace")
+	subsystem := e.config.GetString("stats.system-name")
 	client := e.MakeClient()
 	return NewTimer(namespace, subsystem, name, labelNames, client)
 }
 
 func (e *Epimetheus) NewCounter(name string, labelNames []string) *Counter {
-	namespace := e.config.GetString("prometheus.namespace")
-	subsystem := e.config.GetString("prometheus.system-name")
+	namespace := e.config.GetString("stats.namespace")
+	subsystem := e.config.GetString("stats.system-name")
 	client := e.MakeClient()
 	return NewCounter(namespace, subsystem, name, labelNames, client)
 }
 
 func (e *Epimetheus) NewGauge(name string, labelNames []string) *Gauge {
-	namespace := e.config.GetString("prometheus.namespace")
-	subsystem := e.config.GetString("prometheus.system-name")
+	namespace := e.config.GetString("stats.namespace")
+	subsystem := e.config.GetString("stats.system-name")
 	client := e.MakeClient()
 	return NewGauge(namespace, subsystem, name, labelNames, client)
 }
