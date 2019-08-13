@@ -40,7 +40,7 @@ func (e *Epimetheus) Listen() {
 	}
 	port := e.config.GetInt("stats.prometheus.port")
 	server := NewServer(port)
-	logrus.Debugf("Epimetheus is Listening on port %d", port)
+	logrus.Infof("Epimetheus is Listening on port %d", port)
 	server.Serve()
 }
 
@@ -52,7 +52,7 @@ func (e *Epimetheus) MakeClient() *statsd.Statter {
 	port := e.config.GetInt("stats.statsd.port")
 	host := e.config.GetString("stats.statsd.host")
 	addr := fmt.Sprintf("%s:%d", host, port)
-	logrus.Debugf("Statsd is sending to %s", addr)
+	logrus.Infof("Statsd is sending to %s", addr)
 	client, err := statsd.NewBufferedClient(addr, "", 500*time.Millisecond, 0)
 	if err != nil {
 		logrus.Error("Failed to start Statsd Client")
