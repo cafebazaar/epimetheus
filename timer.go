@@ -73,6 +73,7 @@ func (w *Timer) register(start time.Time, end time.Time, labelValues []string) {
 	w.watcher.WithLabelValues(labelValues...).Observe(duration.Seconds())
 	metaLabel := w.prefix + "." + strings.Join(labelValues, ".")
 	(*w.client).Timing(metaLabel, int64(duration/time.Millisecond), 1.0)
+	(*w.client).Inc(metaLabel, 1, 1.0)
 }
 
 func (w *Timer) hasLabel(label string) int {
