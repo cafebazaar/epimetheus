@@ -17,14 +17,8 @@ type Epimetheus struct {
 }
 
 func NewEpimetheus(config *viper.Viper) *Epimetheus {
-	return &Epimetheus{
+	e := &Epimetheus{
 		config: config,
-	}
-}
-
-func (e *Epimetheus) InitWatchers() {
-	if e.CommTimer != nil {
-		return
 	}
 	ctLabels := [...]string{"service", "method", "status"}
 	e.CommTimer = e.NewTimer("Communications", ctLabels[:])
@@ -32,6 +26,13 @@ func (e *Epimetheus) InitWatchers() {
 	e.FunctionTimer = e.NewTimer("Functions", ptLabels[:])
 	crLabels := [...]string{"cacheName", "status"}
 	e.CacheRate = e.NewCounter("Caches", crLabels[:])
+	return e
+}
+
+func NewEpimetheusServer(config *viper.Viper) *Epimetheus {
+	return &Epimetheus{
+		config: config,
+	}
 }
 
 func (e *Epimetheus) Listen() {
