@@ -14,6 +14,7 @@ type Epimetheus struct {
 	CommTimer     *Timer
 	FunctionTimer *Timer
 	CacheRate     *Counter
+	BGWorker      *Counter
 }
 
 func NewEpimetheus(config *viper.Viper) *Epimetheus {
@@ -26,6 +27,8 @@ func NewEpimetheus(config *viper.Viper) *Epimetheus {
 	e.FunctionTimer = e.NewTimer("Functions", ptLabels[:])
 	crLabels := [...]string{"cacheName", "status"}
 	e.CacheRate = e.NewCounter("Caches", crLabels[:])
+	bgLabels := [...]string{"type", "status"}
+	e.BGWorker = e.NewCounter("BGWorker", bgLabels[:])
 	return e
 }
 
