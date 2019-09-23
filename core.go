@@ -11,8 +11,8 @@ import (
 
 type Epimetheus struct {
 	config        *viper.Viper
-	CommTimer     *Timer
-	FunctionTimer *Timer
+	CommTimer     *TimerWithCounter
+	FunctionTimer *TimerWithCounter
 	CacheRate     *Counter
 	BGWorker      *Counter
 }
@@ -22,9 +22,9 @@ func NewEpimetheus(config *viper.Viper) *Epimetheus {
 		config: config,
 	}
 	ctLabels := [...]string{"service", "method", "status"}
-	e.CommTimer = e.NewTimer("Communications", ctLabels[:])
+	e.CommTimer = e.NewTimerWithCounter("Communications", ctLabels[:])
 	ptLabels := [...]string{"funcName"}
-	e.FunctionTimer = e.NewTimer("Functions", ptLabels[:])
+	e.FunctionTimer = e.NewTimerWithCounter("Functions", ptLabels[:])
 	crLabels := [...]string{"cacheName", "status"}
 	e.CacheRate = e.NewCounter("Caches", crLabels[:])
 	bgLabels := [...]string{"type", "status"}
@@ -83,4 +83,11 @@ func (e *Epimetheus) NewGauge(name string, labelNames []string) *Gauge {
 	subsystem := e.config.GetString("stats.system-name")
 	client := e.MakeClient()
 	return NewGauge(namespace, subsystem, name, labelNames, client)
+}
+
+func (e *Epimetheus) NewTimerWithCounter(name string, labelNames []string) *TimerWithCounter {
+	namespace := e.config.GetString("stats.namespace")
+	subsystem := e.config.GetString("stats.system-name")
+	client := e.MakeClient()
+	return NewTimerWithCounter(namespace, subsystem, name, labelNames, client)
 }
