@@ -9,6 +9,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+// Timer keeps the contents of underlying timer, including labels
 type Timer struct {
 	watcher *prometheus.HistogramVec
 	client  *statsd.Statter
@@ -16,13 +17,14 @@ type Timer struct {
 	labels  []string
 }
 
+// RunningTimer keeps track of timer times
 type RunningTimer struct {
 	Base  *Timer
 	start time.Time
 	end   time.Time
 }
 
-func NewTimer(namespace, subsystem, name string, labelNames []string, client *statsd.Statter) *Timer {
+func newTimer(namespace, subsystem, name string, labelNames []string, client *statsd.Statter) *Timer {
 	opts := prometheus.HistogramOpts{
 		Namespace: namespace,
 		Subsystem: subsystem,
@@ -38,6 +40,7 @@ func NewTimer(namespace, subsystem, name string, labelNames []string, client *st
 	}
 }
 
+// RunWithError gets a function with error and lables and run it with measurment
 func (w *Timer) RunWithError(work func() error, labelValues ...string) error {
 	start := time.Now()
 	err := work()
@@ -49,6 +52,7 @@ func (w *Timer) RunWithError(work func() error, labelValues ...string) error {
 	return err
 }
 
+// RunVoid gets a void function and lables and run it with measurment
 func (w *Timer) RunVoid(work func(), labelValues ...string) {
 	start := time.Now()
 	work()
@@ -56,6 +60,7 @@ func (w *Timer) RunVoid(work func(), labelValues ...string) {
 	w.register(start, end, labelValues)
 }
 
+// Start begins a RunningTimer and then returns it
 func (w *Timer) Start() *RunningTimer {
 	return &RunningTimer{
 		Base:  w,
@@ -63,6 +68,7 @@ func (w *Timer) Start() *RunningTimer {
 	}
 }
 
+// Done finalize the current RunningTimer
 func (rt *RunningTimer) Done(labelValues ...string) {
 	rt.end = time.Now()
 	rt.Base.register(rt.start, rt.end, labelValues)

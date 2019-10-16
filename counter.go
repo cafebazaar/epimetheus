@@ -7,6 +7,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+// Counter keeps the contents of underlying counter, including labels
 type Counter struct {
 	watcher *prometheus.CounterVec
 	client  *statsd.Statter
@@ -14,12 +15,13 @@ type Counter struct {
 	labels  []string
 }
 
+// StaticCounter keeps the contents of underlying counter, excluding labels
 type StaticCounter struct {
 	Base   *Counter
 	values []string
 }
 
-func NewCounter(namespace, subsystem, name string, labelNames []string, client *statsd.Statter) *Counter {
+func newCounter(namespace, subsystem, name string, labelNames []string, client *statsd.Statter) *Counter {
 	opts := prometheus.CounterOpts{
 		Namespace: namespace,
 		Subsystem: subsystem,
@@ -36,19 +38,21 @@ func NewCounter(namespace, subsystem, name string, labelNames []string, client *
 	}
 }
 
+// Inc increments the value of current Counter
 func (w *Counter) Inc(labelValues ...string) {
 	w.watcher.WithLabelValues(labelValues...).Inc()
 	metaLabel := w.prefix + "." + strings.Join(labelValues, ".")
 	(*w.client).Inc(metaLabel, 1, 1.0)
 }
 
-func (w *Counter) NewStaticCounter(labelValues ...string) *StaticCounter {
+func (w *Counter) newStaticCounter(labelValues ...string) *StaticCounter {
 	return &StaticCounter{
 		Base:   w,
 		values: labelValues,
 	}
 }
 
+// Inc increments the value of current Counter
 func (sc *StaticCounter) Inc() {
 	sc.Base.Inc(sc.values...)
 }
