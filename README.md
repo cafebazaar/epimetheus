@@ -1,6 +1,6 @@
 # Epimetheus
 
-Epimetheus is a lightweight wrpper around [Epimetheus Go client](https://github.com/prometheus/client_golang) and [Statsd Go client](github.com/cactus/go-statsd-client) which makes measuring communication, functions, background jobs and ... easier simultaneously with both Prometheus and Statsd.
+Epimetheus is a lightweight wrpper around [Prometheus Go client](https://github.com/prometheus/client_golang) and [Statsd Go client](https://github.com/cactus/go-statsd-client) which makes measuring communication, functions, background jobs, etc. easier, simultaneously with both Prometheus and Statsd.
 
 ## Getting Started
 
