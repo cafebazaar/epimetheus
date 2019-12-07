@@ -1,4 +1,4 @@
-module git.cafebazaar.ir/bazaar/search/epimetheus.git
+module github.com/cafebazaar/epimetheus
 
 go 1.13
 
