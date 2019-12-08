@@ -96,7 +96,7 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 * **Pedram Teymoori** - *Initial work* - [pedramteymoori](https://github.com/pedramteymoori)
 * **Parsa abdollahi** - *Initial work* - []()
 
-See also the list of [contributors](https://github.com/cafebazaar/epimetheus/-/graphs/master) who participated in this project.
+See also the list of [contributors](https://github.com/cafebazaar/epimetheus/graphs/contributors) who participated in this project.
 
 ## License
 
