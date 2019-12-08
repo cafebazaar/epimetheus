@@ -7,7 +7,7 @@ Epimetheus is a lightweight wrpper around [Prometheus Go client](https://github.
 ### Installing
 
 ```console
-go get -u git.cafebazaar.ir/bazaar/search/epimetheus
+go get -u github.com/cafebazaar/epimetheus
 ```
 
 ### Initialize server
@@ -71,7 +71,7 @@ Epimetheus uses Viper as it's config engine. Template should be something like t
 
 ## Documentation
 
-Documents are available at [https://godoc.org/git.cafebazaar.ir/bazaar/search/epimetheus](https://godoc.org/git.cafebazaar.ir/bazaar/search/epimetheus)
+Documents are available at [https://godoc.org/github.com/cafebazaar/epimetheus](https://godoc.org/github.com/cafebazaar/epimetheus)
 
 ## Built With
 
@@ -80,11 +80,11 @@ Documents are available at [https://godoc.org/git.cafebazaar.ir/bazaar/search/ep
 
 ## Contributing
 
-Please read [CONTRIBUTING.md](https://git.cafebazaar.ir/bazaar/search/epimetheus/blob/master/CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+Please read [CONTRIBUTING.md](https://github.com/cafebazaar/epimetheus/blob/master/CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://git.cafebazaar.ir/bazaar/search/epimetheus/tags). 
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/cafebazaar/epimetheus/tags). 
 
 ## Roadmap
     - Improve documentation
@@ -96,7 +96,7 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 * **Pedram Teymoori** - *Initial work* - [pedramteymoori](https://github.com/pedramteymoori)
 * **Parsa abdollahi** - *Initial work* - []()
 
-See also the list of [contributors](https://git.cafebazaar.ir/bazaar/search/epimetheus/-/graphs/master) who participated in this project.
+See also the list of [contributors](https://github.com/cafebazaar/epimetheus/-/graphs/master) who participated in this project.
 
 ## License
 
