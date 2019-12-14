@@ -75,8 +75,8 @@ Documents are available at [https://godoc.org/github.com/cafebazaar/epimetheus](
 
 ## Built With
 
-* [Prometheus Go clinet](github.com/prometheus/client_golang) - The underlying library for Prometheus
-* [Statsd Go client](github.com/cactus/go-statsd-client) - The underlying library for Statsd
+* [Prometheus Go clinet](https://github.com/prometheus/client_golang) - The underlying library for Prometheus
+* [Statsd Go client](https://github.com/cactus/go-statsd-client) - The underlying library for Statsd
 
 ## Contributing
 
