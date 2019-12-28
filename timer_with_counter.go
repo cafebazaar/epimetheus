@@ -1,6 +1,8 @@
 package epimetheus
 
 import (
+	"time"
+
 	"github.com/cactus/go-statsd-client/statsd"
 )
 
@@ -8,14 +10,6 @@ import (
 type TimerWithCounter struct {
 	*Timer
 	*Counter
-}
-
-// RunningTimerWithCounter consists of a RunningTimer and a TimerWithCounter
-//
-// Calling `Done` on the instance which returned by `TimerWithCounter.Start` finalize the operation
-type RunningTimerWithCounter struct {
-	runningTimer     *RunningTimer
-	timerWithCounter *TimerWithCounter
 }
 
 func newTimerWithCounter(namespace, subsystem, name string, labelNames []string, client *statsd.Statter) *TimerWithCounter {
@@ -28,15 +22,12 @@ func newTimerWithCounter(namespace, subsystem, name string, labelNames []string,
 }
 
 // Start creates an instance of `RunningTimerWithCounter` and returns it
-func (w *TimerWithCounter) Start() *RunningTimerWithCounter {
-	return &RunningTimerWithCounter{
-		runningTimer:     w.Timer.Start(),
-		timerWithCounter: w,
-	}
+func (tc *TimerWithCounter) Start() time.Time {
+	return tc.Timer.Start()
 }
 
 // Done marks the related timer as done and increments the related counter too
-func (rt *RunningTimerWithCounter) Done(labelValues ...string) {
-	rt.runningTimer.Done(labelValues...)
-	rt.timerWithCounter.Counter.Inc(labelValues...)
+func (tc *TimerWithCounter) Done(start time.Time, labelValues ...string) {
+	tc.Timer.Done(start, labelValues...)
+	tc.Counter.Inc(labelValues...)
 }
