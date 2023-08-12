@@ -81,30 +81,34 @@ func (e *Epimetheus) makeClient() *statsd.Statter {
 func (e *Epimetheus) NewTimer(name string, labelNames []string) *Timer {
 	namespace := e.config.GetString("stats.namespace")
 	subsystem := e.config.GetString("stats.system-name")
+	isPrometheusEnabled := e.config.GetBool("stats.prometheus.enabled")
 	client := e.makeClient()
-	return newTimer(namespace, subsystem, name, labelNames, client)
+	return newTimer(namespace, subsystem, name, labelNames, client, isPrometheusEnabled)
 }
 
 // NewCounter creates an instance of `Counter` with specified configs
 func (e *Epimetheus) NewCounter(name string, labelNames []string) *Counter {
 	namespace := e.config.GetString("stats.namespace")
 	subsystem := e.config.GetString("stats.system-name")
+	isPrometheusEnabled := e.config.GetBool("stats.prometheus.enabled")
 	client := e.makeClient()
-	return newCounter(namespace, subsystem, name, labelNames, client)
+	return newCounter(namespace, subsystem, name, labelNames, client, isPrometheusEnabled)
 }
 
 // NewGauge creates an instance of `Gauge` with specified configs
 func (e *Epimetheus) NewGauge(name string, labelNames []string) *Gauge {
 	namespace := e.config.GetString("stats.namespace")
 	subsystem := e.config.GetString("stats.system-name")
+	isPrometheusEnabled := e.config.GetBool("stats.prometheus.enabled")
 	client := e.makeClient()
-	return newGauge(namespace, subsystem, name, labelNames, client)
+	return newGauge(namespace, subsystem, name, labelNames, client, isPrometheusEnabled)
 }
 
 // NewTimerWithCounter creates an instance of `TimerWithCounter` with specified configs
 func (e *Epimetheus) NewTimerWithCounter(name string, labelNames []string) *TimerWithCounter {
 	namespace := e.config.GetString("stats.namespace")
 	subsystem := e.config.GetString("stats.system-name")
+	isPrometheusEnabled := e.config.GetBool("stats.prometheus.enabled")
 	client := e.makeClient()
-	return newTimerWithCounter(namespace, subsystem, name, labelNames, client)
+	return newTimerWithCounter(namespace, subsystem, name, labelNames, client, isPrometheusEnabled)
 }

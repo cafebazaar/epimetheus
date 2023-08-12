@@ -21,14 +21,16 @@ type StaticCounter struct {
 	values []string
 }
 
-func newCounter(namespace, subsystem, name string, labelNames []string, client *statsd.Statter) *Counter {
+func newCounter(namespace, subsystem, name string, labelNames []string, client *statsd.Statter, isPrometheusEnabled bool) *Counter {
 	opts := prometheus.CounterOpts{
 		Namespace: namespace,
 		Subsystem: subsystem,
 		Name:      name,
 	}
 	vec := prometheus.NewCounterVec(opts, labelNames)
-	prometheus.MustRegister(vec)
+	if isPrometheusEnabled {
+		prometheus.MustRegister(vec)
+	}
 
 	return &Counter{
 		watcher: vec,
