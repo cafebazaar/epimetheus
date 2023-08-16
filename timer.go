@@ -17,6 +17,8 @@ type Timer struct {
 	labels  []string
 }
 
+// newTimer creates a prometheus.HistogramVec and register it only if isPrometheusEnabled is true otherwise it keeps
+// watcher unregistered to avoid multiple register error in development setups.
 func newTimer(namespace, subsystem, name string, labelNames []string, client *statsd.Statter, isPrometheusEnabled bool) *Timer {
 	opts := prometheus.HistogramOpts{
 		Namespace: namespace,

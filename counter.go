@@ -21,6 +21,8 @@ type StaticCounter struct {
 	values []string
 }
 
+// newCounter creates a prometheus.CounterVec and register it only if isPrometheusEnabled is true otherwise it keeps
+// watcher unregistered to avoid multiple register error in development setups.
 func newCounter(namespace, subsystem, name string, labelNames []string, client *statsd.Statter, isPrometheusEnabled bool) *Counter {
 	opts := prometheus.CounterOpts{
 		Namespace: namespace,
