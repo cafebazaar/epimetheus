@@ -17,14 +17,18 @@ type Timer struct {
 	labels  []string
 }
 
-func newTimer(namespace, subsystem, name string, labelNames []string, client *statsd.Statter) *Timer {
+// newTimer creates a prometheus.HistogramVec and register it only if isPrometheusEnabled is true otherwise it keeps
+// watcher unregistered to avoid multiple register error in development setups.
+func newTimer(namespace, subsystem, name string, labelNames []string, client *statsd.Statter, isPrometheusEnabled bool) *Timer {
 	opts := prometheus.HistogramOpts{
 		Namespace: namespace,
 		Subsystem: subsystem,
 		Name:      name,
 	}
 	vec := prometheus.NewHistogramVec(opts, labelNames)
-	prometheus.MustRegister(vec)
+	if isPrometheusEnabled {
+		prometheus.MustRegister(vec)
+	}
 	return &Timer{
 		watcher: vec,
 		labels:  labelNames,

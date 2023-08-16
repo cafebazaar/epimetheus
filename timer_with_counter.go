@@ -12,9 +12,9 @@ type TimerWithCounter struct {
 	*Counter
 }
 
-func newTimerWithCounter(namespace, subsystem, name string, labelNames []string, client *statsd.Statter) *TimerWithCounter {
-	timer := newTimer(namespace, subsystem, name+"Timer", labelNames, client)
-	counter := newCounter(namespace, subsystem, name+"Counter", labelNames, client)
+func newTimerWithCounter(namespace, subsystem, name string, labelNames []string, client *statsd.Statter, isPrometheusEnabled bool) *TimerWithCounter {
+	timer := newTimer(namespace, subsystem, name+"Timer", labelNames, client, isPrometheusEnabled)
+	counter := newCounter(namespace, subsystem, name+"Counter", labelNames, client, isPrometheusEnabled)
 	return &TimerWithCounter{
 		timer,
 		counter,

@@ -21,14 +21,18 @@ type StaticGauge struct {
 	values []string
 }
 
-func newGauge(namespace, subsystem, name string, labelNames []string, client *statsd.Statter) *Gauge {
+// newGauge creates a prometheus.GaugeVec and register it only if isPrometheusEnabled is true otherwise it keeps
+// watcher unregistered to avoid multiple register error in development setups.
+func newGauge(namespace, subsystem, name string, labelNames []string, client *statsd.Statter, isPrometheusEnabled bool) *Gauge {
 	opts := prometheus.GaugeOpts{
 		Namespace: namespace,
 		Subsystem: subsystem,
 		Name:      name,
 	}
 	vec := prometheus.NewGaugeVec(opts, labelNames)
-	prometheus.MustRegister(vec)
+	if isPrometheusEnabled {
+		prometheus.MustRegister(vec)
+	}
 
 	return &Gauge{
 		watcher: vec,
