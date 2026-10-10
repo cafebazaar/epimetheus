@@ -42,7 +42,7 @@ func (t *Timer) RunWithError(work func() error, labelValues ...string) error {
 	start := time.Now()
 	err := work()
 	end := time.Now()
-	if indx := t.hasLabel("ok"); indx > 0 {
+	if indx := t.hasLabel("ok"); indx >= 0 {
 		labelValues[indx] = fmt.Sprint(err == nil)
 	}
 	t.register(start, end, labelValues)
